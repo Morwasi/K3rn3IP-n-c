@@ -36,9 +36,9 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
         run: |
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          ls -l private_key.pem
+          echo "$MyAPIKeyPair" > MyAPIKeyPair.pem
+          chmod 600 MyAPIKeyPair.pem
+          ls -l MyAPIKeyPair.pem
 
       - name: Create Deployment Directory
         env:
