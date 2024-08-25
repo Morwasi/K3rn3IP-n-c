@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  AWS_REGION: us-west-2                     # Set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: us-west-2                     # Set this to your preferred AWS region
   HOST: ${{ secrets.EC2_HOST }}             # Set this to your EC2 instance public IP or hostname
   USER: ${{ secrets.EC2_USER }}             # Set this to your EC2 instance username (usually ec2-user for Amazon Linux)
   PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }} # Your private key for SSH access to the EC2 instance
@@ -35,7 +35,7 @@ jobs:
       - name: Save Private Key
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem  # Temporarily set permissions to 600 for debugging
+          chmod 400 private_key.pem  # Set permissions for security
           ls -l private_key.pem       # To see the permissions after setting
 
       - name: Create Deployment Directory
