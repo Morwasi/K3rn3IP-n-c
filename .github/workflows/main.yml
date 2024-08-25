@@ -1,0 +1,62 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-west-2                     # Set this to your preferred AWS region, e.g. us-west-1
+  HOST: ${{ secrets.EC2_HOST }}             # Set this to your EC2 instance public IP or hostname
+  USER: ${{ secrets.EC2_USER }}             # Set this to your EC2 instance username (usually ec2-user for Amazon Linux)
+  PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }} # Your private key for SSH access to the EC2 instance
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Save Private Key
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 400 private_key.pem  # Set permissions for security
+
+      - name: Create Deployment Directory
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ env.USER }}@${{ env.HOST }} "mkdir -p /home/${{ env.USER }}/campus_navigation_api_gateway || true"
+
+      - name: Deploy Files to EC2
+        run: |
+          scp -i private_key.pem -o StrictHostKeyChecking=no -r * ${{ env.USER }}@${{ env.HOST }}:/home/${{ env.USER }}/campus_navigation_api_gateway
+
+      - name: Verify Files on EC2 Instance
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ env.USER }}@${{ env.HOST }} "ls -la /home/${{ env.USER }}/campus_navigation_api_gateway"
+
+      - name: Install Node.js and npm on EC2
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ env.USER }}@${{ env.HOST }} "sudo yum install -y nodejs npm"
+
+      - name: Install Node.js Dependencies on EC2
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ env.USER }}@${{ env.HOST }} "cd /home/${{ env.USER }}/campus_navigation_api_gateway && npm install"
+
+      - name: Start Node.js Server
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ env.USER }}@${{ env.HOST }} "cd /home/${{ env.USER }}/campus_navigation_api_gateway && nohup node index.js > server.log 2>&1 &"
