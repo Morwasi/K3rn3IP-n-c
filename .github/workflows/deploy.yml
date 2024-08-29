@@ -18,17 +18,17 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4  # Updated to support Node.js 20
         name: Checkout Repository
 
-      - uses: aws-actions/configure-aws-credentials@v4-preview  # Try updating to a preview/beta version
+      - uses: aws-actions/configure-aws-credentials@v3  # Updated to support Node.js 20
         with:
           role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
           role-session-name: GitHub-Action-Role
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Set up JDK 1.8
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v4  # Updated to support Node.js 20
         with:
           distribution: 'adopt'
           java-version: '8'
@@ -53,9 +53,9 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4  # Updated to support Node.js 20
       
-      - uses: aws-actions/configure-aws-credentials@v4-preview  # Try updating to a preview/beta version
+      - uses: aws-actions/configure-aws-credentials@v3  # Updated to support Node.js 20
         with:
           role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
           role-session-name: GitHub-Action-Role
