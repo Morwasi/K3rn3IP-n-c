@@ -19,13 +19,19 @@ jobs:
           sudo apt-get install -y awscli
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region us-east-1
+          aws configure set default.region us-west-2  # Adjust this if you're using a different region
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-instance-public-ip << 'EOF'
+          ssh -o StrictHostKeyChecking=no ec2-user@34.218.242.107 << 'EOF'
             if [ ! -d "/home/ec2-user/app" ]; then
-              git clone https://github.com/yourusername/yourrepo.git /home/ec2-user/app
+              git clone https://github.com/Morwasi/K3rn3IP-n-c.git /home/ec2-user/app
             fi
 
             cd /home/ec2-user/app
