@@ -3,7 +3,7 @@ name: Deploy Express.js to EC2
 on:
   push:
     branches:
-      - main  # Change this to your default branch
+      - main
 
 jobs:
   deploy:
@@ -11,35 +11,31 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Set up AWS CLI
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.AWS_SSH_KEY }}
+
+      - name: Test SSH Connection
         run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region us-east-1
+          ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} echo "SSH connection successful"
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-instance-public-ip << 'EOF'
-            # Navigate to the project directory or clone the repository if not already done
-            if [ ! -d "/home/ec2-user/app" ]; then
-              git clone https://github.com/yourusername/yourrepo.git /home/ec2-user/app
+          ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} << 'EOF'
+            if [ ! -d "/home/${{ secrets.AWS_EC2_USER }}/app" ]; then
+              git clone https://github.com/yourusername/yourrepo.git /home/${{ secrets.AWS_EC2_USER }}/app
             fi
 
-            cd /home/ec2-user/app
+            cd /home/${{ secrets.AWS_EC2_USER }}/app
 
-            # Pull the latest changes
             git pull origin main
 
-            # Install dependencies
             npm install
 
-            # Restart the application using PM2
             pm2 restart app || pm2 start npm --name "app" -- start
 
-            # Save the PM2 process list to start on reboot
             pm2 save
           EOF
