@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, linux, x64]  # Ensure your runner is labeled 'self-hosted'
+    runs-on: ubuntu-latest
 
     steps:
     - name: Pull Docker image
