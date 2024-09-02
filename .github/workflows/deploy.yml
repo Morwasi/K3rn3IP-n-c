@@ -1,46 +1,31 @@
-name: Deploy Express.js to EC2
+name: Deploy to EC2
 
 on:
   push:
     branches:
-      - main  # Change this to your default branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region us-west-2  # Modify if necessary
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+    - name: Copy files to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -r . ec2-user@your-ec2-public-dns:/home/ec2-user/app
 
-      - name: Deploy to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@34.218.242.107 << 'EOF'
-            if [ ! -d "/home/ubuntu/app" ]; then   # Use 'ubuntu' if the username is ubuntu
-              git clone https://github.com/yourusername/yourrepo.git /home/ubuntu/app
-            fi
-
-            cd /home/ubuntu/app
-
-            git pull origin main
-
-            npm install
-
-            pm2 restart app || pm2 start npm --name "app" -- start
-
-            pm2 save
-          EOF
+    - name: SSH into EC2 and deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-public-dns << 'EOF'
+          cd /home/ec2-user/app
+          docker build -t my-nginx-image .
+          docker run -d -p 80:80 my-nginx-image
+        EOF
