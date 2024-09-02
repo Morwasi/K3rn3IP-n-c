@@ -12,11 +12,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
+      
     - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
+      # Updated to the assumed latest stable version. 
+      # Please verify the latest version on the GitHub Marketplace or its repository
+      uses: webfactory/ssh-agent@v0.6.0  # Assuming v0.6.0, replace with the latest version
+
       with:
-        ssh-private-key: ${{ secrets.SSH_KEY}}
+        ssh-private-key: ${{ secrets.SSH_KEY }}
 
     - name: Copy files to EC2
       run: |
