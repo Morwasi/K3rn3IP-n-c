@@ -1,34 +1,48 @@
-name: Deploy to EC2
+name: CI/CD Pipeline with Terraform
 
 on:
   push:
     branches:
-      - main
+      - main  # Only run on pushes to the main branch
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up SSH
-      # Updated to the assumed latest stable version. 
-      # Please verify the latest version on the GitHub Marketplace or its repository
-      uses: webfactory/ssh-agent@v0.6.0  # Assuming v0.6.0, replace with the latest version
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
       with:
-        ssh-private-key: ${{ secrets.SSH_KEY }}
+        terraform_version: 1.6.0
 
-    - name: Copy files to EC2
-      run: |
-        scp -o StrictHostKeyChecking=no -r . ec2-user@your-ec2-public-dns:/home/ec2-user/app
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
 
-    - name: SSH into EC2 and deploy
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-public-dns << 'EOF'
-          cd /home/ec2-user/app
-          docker build -t my-nginx-image .
-          docker run -d -p 80:80 my-nginx-image
-        EOF
+    - name: Initialize Terraform
+      run: terraform init
+      working-directory: infra/terraform  # Path to Terraform files
+
+    - name: Terraform Refresh
+      run: terraform refresh
+      working-directory: infra/terraform  # Path to Terraform files
+
+    - name: Terraform Destroy Existing Instance
+      working-directory: infra/terraform
+      run: terraform destroy -auto-approve -target=aws_instance.app_server
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -out=tfplan
+      working-directory: infra/terraform  # Path to Terraform files
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve tfplan
+      working-directory: infra/terraform  # Path to Terraform files
