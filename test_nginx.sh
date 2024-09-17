@@ -18,7 +18,7 @@ curl -I http://localhost:8080/api/v1/rental/docs | grep HTTP
 
 # Test Bus Schedule Service
 echo "Testing Bus Schedule Service..."
-curl -I http://localhost:8080/api/v1/bus-schedule/ | grep HTTP
+curl -I http://localhost:8080/api/v1/bus-schedule/docs | grep HTTP
 
 # Test Navigation Service
 echo "Testing Navigation Service..."

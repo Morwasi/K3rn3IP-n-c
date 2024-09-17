@@ -13,6 +13,23 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v2  # Set up Node.js for testing
+      with:
+        node-version: '14'  # Change version as needed for your project
+
+    - name: Install Dependencies
+      run: npm install  # Ensure you have package.json setup before this step
+
+    - name: Run Tests with Coverage
+      run: npm test -- --coverage  # Run Jest tests and collect coverage data
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        file: ./coverage/lcov.info  # Ensure this points to your coverage report
+        token: ${{ secrets.CODECOV_TOKEN }}  # Optional: token for private repos
+
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
       with:
