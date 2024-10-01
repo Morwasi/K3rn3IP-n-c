@@ -7,3 +7,8 @@ variable "github_token" {
   description = "Private SSH key for GitHub access"
   type        = string
 }
+
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
+}
