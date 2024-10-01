@@ -6,6 +6,20 @@ data "aws_security_group" "existing_sg" {
   name = "launch-wizard-1"  # Replace with your security group name
 }
 
+resource "aws_lb_target_group" "gateway_tg" {
+  name     = "gatewayTG"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id  # Ensure you specify the correct VPC ID
+  target_type = "ip"     # Assuming your targets are IP addresses
+}
+
+resource "aws_lb_target_group_attachment" "gateway_tg_attach" {
+  target_group_arn = aws_lb_target_group.gateway_tg.arn
+  target_id        = aws_instance.app_server.private_ip  # Private IP
+  port             = 80
+}
+
 resource "aws_instance" "app_server" {
   ami           = "ami-0a38c1c38a15fed74"  # Amazon Linux 2 AMI
   instance_type = "t2.micro"
