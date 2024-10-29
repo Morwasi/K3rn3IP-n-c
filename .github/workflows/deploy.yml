@@ -54,7 +54,7 @@ jobs:
       working-directory: infra/terraform
 
     - name: Terraform Import Existing Target Group
-      run: terraform import aws_lb_target_group.gateway_tg arn:aws:elasticloadbalancing:us-west-2:575108937027:targetgroup/gatewayTG/a321b3db3f21232b # Replace <target_group_arn> with the actual ARN
+      run: terraform import aws_lb_target_group.gateway_tg arn:aws:elasticloadbalancing:us-east-1:533266983761:targetgroup/gatewayTG/5025f84cd935d39b # Replace <target_group_arn> with the actual ARN
       working-directory: infra/terraform
 
 
