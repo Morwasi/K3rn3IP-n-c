@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-west-2"  # Replace with your preferred region
+  region = "us-east-1"  # Replace with your preferred region
 }
 
 data "aws_security_group" "existing_sg" {
@@ -21,7 +21,7 @@ resource "aws_lb_target_group_attachment" "gateway_tg_attach" {
 }
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-0a38c1c38a15fed74"  # Amazon Linux 2 AMI
+  ami           = "ami-06b21ccaeff8cd686"  # Amazon Linux 2 AMI
   instance_type = "t2.micro"
 
   key_name = var.key_name  # Replace with your SSH key name
@@ -69,7 +69,7 @@ resource "aws_instance" "app_server" {
 # Associate an existing Elastic IP with the instance
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.app_server.id
-  allocation_id = "eipalloc-0b5d8ba887abeb34a"  # Use your actual Elastic IP allocation ID
+  allocation_id = "eipalloc-04d7c967bb71d2bfd"  # Use your actual Elastic IP allocation ID
 }
 
 output "instance_ip" {

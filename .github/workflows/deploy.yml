@@ -43,19 +43,19 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
+        aws-region: us-east-1
 
     - name: Initialize Terraform
       run: terraform init
       working-directory: infra/terraform  # Path to Terraform files
 
-    # - name: Remove TG
-    #   run: terraform state rm aws_lb_target_group.gateway_tg
-    #   working-directory: infra/terraform
+    - name: Remove TG
+      run: terraform state rm aws_lb_target_group.gateway_tg
+      working-directory: infra/terraform
 
-    # - name: Terraform Import Existing Target Group
-    #   run: terraform import aws_lb_target_group.gateway_tg arn:aws:elasticloadbalancing:us-west-2:575108937027:targetgroup/gatewayTG/a321b3db3f21232b # Replace <target_group_arn> with the actual ARN
-    #   working-directory: infra/terraform
+    - name: Terraform Import Existing Target Group
+      run: terraform import aws_lb_target_group.gateway_tg arn:aws:elasticloadbalancing:us-west-2:575108937027:targetgroup/gatewayTG/a321b3db3f21232b # Replace <target_group_arn> with the actual ARN
+      working-directory: infra/terraform
 
 
     - name: Terraform Refresh
