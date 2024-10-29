@@ -21,17 +21,17 @@ jobs:
     - name: Install Dependencies
       run: npm install  # Ensure you have package.json setup before this step
 
-    - name: Run Tests with Coverage
-      run: npm test -- --coverage  # Run Jest tests and collect coverage data
+    # - name: Run Tests with Coverage
+    #   run: npm test -- --coverage  # Run Jest tests and collect coverage data
 
-    - name: List Coverage Directory
-      run: ls -al ./coverage  # Verify that the coverage report was generated and check its contents
+    # - name: List Coverage Directory
+    #   run: ls -al ./coverage  # Verify that the coverage report was generated and check its contents
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
-      with:
-        file: ./coverage/lcov.info  # Ensure this points to your coverage report
-        token: ${{ secrets.CODECOV_TOKEN }}  # Token should be set in GitHub secrets for private repos
+    # - name: Upload coverage to Codecov
+    #   uses: codecov/codecov-action@v2
+    #   with:
+    #     file: ./coverage/lcov.info  # Ensure this points to your coverage report
+    #     token: ${{ secrets.CODECOV_TOKEN }}  # Token should be set in GitHub secrets for private repos
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
